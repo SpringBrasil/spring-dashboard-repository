@@ -1,12 +1,16 @@
 package com.springbrasil.repository.controller;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,15 +18,16 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.springbrasil.repository.controller.RepositoryController;
 import com.springbrasil.repository.helper.JsonHelper;
 import com.springbrasil.repository.model.Repository;
 import com.springbrasil.repository.model.RepositoryType;
 import com.springbrasil.repository.service.RepositoryService;
+
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(RepositoryController.class)
@@ -43,21 +48,31 @@ public class RepositoryControllerUnitTest {
 		repository.setUrl("http://my_repository");
 		repository.setType(RepositoryType.GITHUB);
 		doReturn(repository).when(repositoryService).save(any(Repository.class));
+		doReturn(new PageImpl<>(Arrays.asList(repository))).when(repositoryService).getAll(anyInt(), anyInt());
 	}
-	
+
 	@Test
 	public void shouldCreateRepository() throws Exception {
 		String request = JsonHelper.getRequestFileAsString("repository/create_repository_success.json");
 		String response = JsonHelper.getResponseFileAsString("repository/create_repository_success.json");
-		
-		mvc.perform(post("/repositories")
-			.contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-			.content(request)
-			.accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
-			)
-	        .andExpect(status().isCreated()).andExpect(content().json(response));
-		
+
+		mvc.perform(post("/repositories").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(request)
+				.accept(MediaType.APPLICATION_JSON_UTF8_VALUE))
+				.andExpect(status().isCreated())
+				.andExpect(content().json(response));
+
 		verify(repositoryService, times(1)).save(any(Repository.class));
+	}
+
+	@Test
+	public void shouldGetAllRepositories() throws Exception {
+		String response = JsonHelper.getResponseFileAsString("repository/get_all_repositories_success.json");
+
+		mvc.perform(get("/repositories").accept(MediaType.APPLICATION_JSON_UTF8_VALUE))
+				.andExpect(status().isOk())
+				.andExpect(content().json(response));
+
+		verify(repositoryService, times(1)).getAll(0, 10);
 	}
 
 }

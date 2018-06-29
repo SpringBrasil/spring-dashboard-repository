@@ -8,7 +8,7 @@ public class Repository {
 	private String id;
 	private String url;
 	private RepositoryType type;
-	
+
 	public String getId() {
 		return id;
 	}

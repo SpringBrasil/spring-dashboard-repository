@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.springbrasil.repository.dao.RepositoryDao;
@@ -30,6 +31,13 @@ public class RepositoryServiceUnitTest {
 		repositoryService.save(new Repository());
 		
 		verify(repositoryDao, times(1)).save(any(Repository.class));
+	}
+	
+	@Test
+	public void shouldFindAllRepositories() {
+		repositoryService.getAll(0, 10);
+		
+		verify(repositoryDao, times(1)).findAll(any(PageRequest.class));
 	}
 
 }
