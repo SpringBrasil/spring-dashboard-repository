@@ -1,8 +1,13 @@
 package com.springbrasil.repository.service;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import javax.ws.rs.NotFoundException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +43,20 @@ public class RepositoryServiceUnitTest {
 		repositoryService.getAll(0, 10);
 		
 		verify(repositoryDao, times(1)).findAll(any(PageRequest.class));
+	}
+	
+	@Test
+	public void shouldFindOneRepository() {
+		doReturn(new Repository()).when(repositoryDao).findOne(anyString());
+		repositoryService.get("123");
+		
+		verify(repositoryDao, times(1)).findOne(anyString());
+	}
+	
+	@Test(expected=NotFoundException.class)
+	public void shouldThrowErrorWhenDoesntFindOneRepository() {
+		doReturn(null).when(repositoryDao).findOne(eq("unexisting_repository"));
+		repositoryService.get("unexisting_repository");
 	}
 
 }

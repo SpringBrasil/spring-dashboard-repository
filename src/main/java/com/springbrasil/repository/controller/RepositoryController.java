@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,6 +38,12 @@ public class RepositoryController {
 			@RequestParam(required=false, defaultValue="0") Integer page,
 			@RequestParam(required=false, defaultValue="10") Integer size) {
 		return repositoryService.getAll(page, size);
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/repositories/{repository_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseStatus(code = HttpStatus.OK)
+	public Repository getRepositories(@PathVariable(name="repository_id") String repositoryId) {
+		return repositoryService.get(repositoryId);
 	}
 
 }

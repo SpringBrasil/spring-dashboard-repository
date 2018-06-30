@@ -1,5 +1,9 @@
 package com.springbrasil.repository.service;
 
+import java.util.Optional;
+
+import javax.ws.rs.NotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +24,12 @@ public class RepositoryService {
 
 	public Page<Repository> getAll(Integer page, Integer size) {
 		return repositoryDao.findAll(new PageRequest(page, size));
+	}
+
+	public Repository get(String repositoryId) {
+		return Optional
+				.ofNullable(repositoryDao.findOne(repositoryId))
+				.orElseThrow(() -> new NotFoundException(repositoryId));
 	}
 
 }
